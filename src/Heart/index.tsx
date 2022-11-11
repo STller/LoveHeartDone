@@ -14,10 +14,10 @@ const Button = styled.button`
 const CountContainer = styled.div`
   position: absolute;
   overflow: visible;
-  bottom: -240%;
+  bottom: -300%;
   left: 0;
-  transform: translateX(-46%);
-  height: 55px;
+  transform: translateX(-40%);
+  height: 72px;
   overflow: hidden;
 `;
 
@@ -48,20 +48,20 @@ const CountReel = styled.div<styledCommonType>`
   ${(props) =>
     props.hearted &&
     css`
-      animation: ${(props: styledCommonType) => animate(props.hearted ? -40 : 0)} 0.5s ease-in-out
+      animation: ${(props: styledCommonType) => animate(props.hearted ? -80 : 0)} 0.5s ease-in-out
         forwards;
     `};
 `;
 
-const Count = styled.p<styledCommonType>`
+const Count = styled.span<styledCommonType>`
+  display: block;
   font-size: 16px;
   color: #b2b2b2;
   padding-bottom: 8px;
   width: 80vw;
-  height: 18px;
-  line-height: 18px;
-
-  color: ${(props) => (props.red ? "red" : "#b2b2b2")};
+  height: 72px;
+  line-height: 36px;
+  color: ${(props) => (props.red ? "#f05053" : "#b2b2b2")};
 `;
 
 const heartbeat = keyframes`
