@@ -39,17 +39,21 @@ const animate = (yNum: number) => keyframes`
   }
 `;
 
-const CountReel = styled.div`
+type styledCommonType = {
+  hearted?: boolean;
+  red?: boolean;
+}
+const CountReel = styled.div<styledCommonType>`
   will-change: transform;
   ${(props) =>
     props.hearted &&
     css`
-      animation: ${(props) => animate(props.hearted ? -40 : 0)} 0.5s ease-in-out
+      animation: ${(props: styledCommonType) => animate(props.hearted ? -40 : 0)} 0.5s ease-in-out
         forwards;
     `};
 `;
 
-const Count = styled.p`
+const Count = styled.p<styledCommonType>`
   font-size: 16px;
   color: #b2b2b2;
   padding-bottom: 8px;
@@ -134,7 +138,7 @@ const Container = styled.span`
     will-change: transform;
   }
 
-  ${(props) =>
+  ${(props:styledCommonType) =>
     props.hearted &&
     css`
       &:before {
