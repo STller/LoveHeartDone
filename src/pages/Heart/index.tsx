@@ -1,4 +1,4 @@
-import React, { PureComponent } from "react";
+import React, { PureComponent, useState } from "react";
 import styled, { css, keyframes } from "styled-components";
 
 const Button = styled.button`
@@ -15,14 +15,13 @@ const CountContainer = styled.div`
   position: absolute;
   overflow: visible;
   bottom: -300%;
-  left: 0;
-  transform: translateX(-40%);
+  transform: translateX(-50%);
   height: 72px;
   overflow: hidden;
 `;
 
 const slide = keyframes`
-  0 {
+  0% {
     // transform: translate3d(0, 0, 0);
   }
   100% {
@@ -31,7 +30,7 @@ const slide = keyframes`
 `;
 
 const animate = (yNum: number) => keyframes`
-  0 {
+  0% {
     // transform: translateY(0px);
   }
   100% {
@@ -42,14 +41,15 @@ const animate = (yNum: number) => keyframes`
 type styledCommonType = {
   hearted?: boolean;
   red?: boolean;
-}
+};
 const CountReel = styled.div<styledCommonType>`
   will-change: transform;
   ${(props) =>
     props.hearted &&
     css`
-      animation: ${(props: styledCommonType) => animate(props.hearted ? -80 : 0)} 0.5s ease-in-out
-        forwards;
+      animation: ${(props: styledCommonType) =>
+          animate(props.hearted ? -80 : 0)}
+        0.5s ease-in-out forwards;
     `};
 `;
 
@@ -138,7 +138,7 @@ const Container = styled.span`
     will-change: transform;
   }
 
-  ${(props:styledCommonType) =>
+  ${(props: styledCommonType) =>
     props.hearted &&
     css`
       &:before {
@@ -159,21 +159,22 @@ const Container = styled.span`
     `};
 `;
 
-interface propsType {
-  hearted: boolean;
-  onClick: () => void;
-}
+// interface propsType {
+//   hearted: boolean;
+//   onClick: () => void;
+// }
 
-const Heart = (props: propsType) => {
+const Heart = () => {
+  const [state, setState] = useState(false);
   return (
-    <Button onClick={props.onClick}>
-      <Container hearted={props.hearted}>
+    <Button onClick={() => setState((state) => !state)}>
+      <Container hearted={state}>
         <svg xmlns="http://www.w3.org/2000/svg" width="17" height="15">
           <path d="M12.4713 0C10.7596 0 9.2698.95 8.5 2.3512 7.73.95 6.2404 0 4.5287 0 2.0274 0 0 2.0277 0 4.5287c0 5.2882 8.5 9.824 8.5 9.824S17 9.817 17 4.529C17 2.0277 14.9726 0 12.4713 0z" />
         </svg>
 
-        <CountContainer>
-          <CountReel hearted={props.hearted}>
+        <CountContainer className="CountContainer">
+          <CountReel className="CountReel" hearted={state}>
             <Count>小小爱心熄灭啦，呐，人生也有不如意的时候啦(ಥ﹏ಥ)</Count>
             <Count red>小小爱心被点亮啦，宝贝每天都有好心情奥~~</Count>
           </CountReel>

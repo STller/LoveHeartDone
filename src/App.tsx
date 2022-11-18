@@ -1,7 +1,8 @@
 import React, { Component, useState } from "react";
 import ReactDOM from "react-dom/client";
+import { Route, Routes } from "react-router-dom";
 import styled, { createGlobalStyle } from "styled-components";
-import Heart from "./Heart/index";
+import Heart from "./pages/Heart/index";
 
 createGlobalStyle`
   body {
@@ -26,14 +27,11 @@ const Container = styled.div`
 `;
 
 function App() {
-  const [state, setState] = useState(false);
-
-  const handleOnHeart = () => {
-    setState((state) => !state);
-  };
   return (
     <Container>
-      <Heart hearted={state} onClick={handleOnHeart} />
+      <Routes>
+        <Route path="/comeOn" element={<Heart />} />
+      </Routes>
     </Container>
   );
 }
