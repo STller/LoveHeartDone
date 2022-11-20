@@ -32,7 +32,7 @@ function JumpHeart() {
         const renderer = new THREE.WebGLRenderer({
           antialias: true // 是否执行抗锯齿
         });
-        renderer.setClearColor(0xff5555); // 设置舞台背景颜色
+        renderer.setClearColor(0xff0000); // 设置舞台背景颜色
         renderer.setSize(window.innerWidth, window.innerHeight); // 设置舞台尺寸
         
         /**
@@ -70,7 +70,7 @@ function JumpHeart() {
           (heart! as Mesh).geometry.translate(0, -0.4, 0);
           // 设置heart的材质颜色
           (heart! as Mesh).material = new THREE.MeshBasicMaterial({
-            color: 0xff0000
+            color: 0xff5555
           });
           console.log(obj)
           group.add(heart!);
