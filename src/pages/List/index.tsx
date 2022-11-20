@@ -8,12 +8,19 @@ height: 100vh;
 display: flex;
 justify-content: center;
 align-items: center;
+.list{
+    margin-top: 10px;
+    &:first-child {
+        margin-top: 0px;
+    }
+}
 `;
 
 export default function List() {
   const navigate = useNavigate();
   const [list, setList] = useState([
     { path: "/app/comeOn", label: "加油打气" },
+    { path: "/app/jumpHeart", label: "跳动的心❤" },
   ]);
 
 
@@ -21,9 +28,9 @@ export default function List() {
     navigate(path)
   }
   return (
-    <ListContainer className="ListContainer">
+    <ListContainer className="ListContainer" style={{display: 'flex',flexDirection: 'column',justifyContent: 'center'}}>
       {list.map((i, index) => (
-        <span onClick={() => handleNavigate(i.path)} key={i.label}>{`${
+        <span className="list" onClick={() => handleNavigate(i.path)} key={i.label}>{`${
           index + 1
         }、  ${i.label}`}</span>
       ))}

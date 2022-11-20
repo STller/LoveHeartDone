@@ -3,6 +3,7 @@ import ReactDOM from "react-dom/client";
 import { Route, Routes } from "react-router-dom";
 import styled, { createGlobalStyle } from "styled-components";
 import Heart from "./pages/Heart/index";
+import JumpHeart from "./pages/JumpHeart";
 
 createGlobalStyle`
   body {
@@ -31,6 +32,7 @@ function App() {
     <Container>
       <Routes>
         <Route path="/comeOn" element={<Heart />} />
+        <Route path="/jumpHeart" element={<JumpHeart />} />
       </Routes>
     </Container>
   );
