@@ -1,189 +1,176 @@
-import { Canvas, useFrame, useLoader } from "@react-three/fiber";
-import styled from "styled-components";
-import { Environment, OrbitControls, Sampler } from "@react-three/drei";
-import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
-import { MeshSurfaceSampler } from "three/examples/jsm/math/MeshSurfaceSampler";
-import {
-  Group,
-  Mesh,
-  MeshBasicMaterial,
-  LineBasicMaterial,
-  Vector3,
-  BufferGeometry,
-  LineSegments,
-  BufferAttribute,
-} from "three";
-import { createNoise4D, NoiseFunction4D } from "simplex-noise";
-import { gsap } from "gsap";
-import Heart from "../Heart";
+import { useEffect, useRef } from "react";
+import { createNoise4D } from "simplex-noise";
+import * as THREE from 'three'
+import { Mesh, Vector3 } from "three";
+import { TrackballControls } from 'three/examples/jsm/controls/TrackballControls'
+import { OBJLoader } from 'three/examples/jsm/loaders/OBJLoader'
+import { MeshSurfaceSampler } from 'three/examples/jsm/math/MeshSurfaceSampler'
+import { gsap } from 'gsap'
 
-const JumpHeartContainer = styled.div`
-  width: 100%;
-  height: 100%;
-`;
+function JumpHeart() {
+    const divRef = useRef(null)
+    const grassAmount = 20000
 
-class Grass {
-  pos: any;
-  scale: number;
-  one: any;
-  two: any;
-  beat: { a: number };
-  sampler: any;
-  noise4D: any;
-  constructor(sampler: any, pos: Vector3, beat: { a: number }, noise4D: any) {
-    this.pos = pos.clone();
-    this.scale = Math.random() * 0.001 + 0.001;
-    this.one = null;
-    this.two = null;
-    this.beat = { a: 0 };
-    this.sampler = sampler;
-    this.noise4D = noise4D;
-  }
+    useEffect(() => {
+        console.clear();
 
-  update(a: number) {
-    const noise =
-      this.noise4D(
-        this.pos.x * 1.5,
-        this.pos.y * 1.5,
-        this.pos.z * 1.5,
-        a * 0.0005
-      ) + 2;
-    this.one = this.pos
-      .clone()
-      .multiplyScalar(1.21 + noise * 0.15 * this.beat.a); // 第一个点的位置
-    this.two = this.one.clone().add(this.one.clone().setLength(this.scale)); // 第二个点的位置
-  }
-}
-
-/**
- * 🫀心脏跳动
- * @returns
- */
-export default function JumpHeart() {
-  const noise4d = createNoise4D();
-  const obj = useLoader(
-    OBJLoader,
-    "https://assets.codepen.io/127738/heart_2.obj"
-  ); // 获取模型obj
-  console.log(obj);
-  const pos = new Vector3();
-
-  (obj.children[0] as Mesh).material = new MeshBasicMaterial({
-    color: 0xff0000,
-  });
-
-  const Scene = ({
-    itemObj,
-    noise4d,
-  }: {
-    itemObj: Group;
-    noise4d: NoiseFunction4D;
-  }) => {
-    const geometry = new BufferGeometry();
-    const material = new LineBasicMaterial({
-      color: 0xf0f0f0,
-    });
-    const lines = new LineSegments(geometry, material);
-    itemObj.add(lines);
-
-    let grassAmount = 200; // Grass数量
-    let positions: any[] = []; // 位置
-    const spkies: Grass[] = []; // Grass的实例存放
-    const beat = { a: 0 };
-    let sampler: MeshSurfaceSampler | null = null; // 采样器
-    let originHeart: (number | undefined)[] = [];
-    function init() {
-      positions = [];
-      for (let i = 0; i < grassAmount; i++) {
-        const g = new Grass(sampler, pos, beat, noise4d);
-        spkies.push(g);
-      }
-    }
-
-    init();
-    originHeart = Array.from(
-      (itemObj.children[0] as Mesh).geometry.attributes.position.array
-    );
-    sampler = new MeshSurfaceSampler(itemObj.children[0] as Mesh).build(); // 为模型添加采样器
-
-    gsap
-      .timeline({
-        repeat: -1,
-        repeatDelay: 0.1,
-      })
-      .to(beat, {
-        a: 1.2,
-        duration: 1,
-        ease: "power2.in",
-      })
-      .to(beat, {
-        a: 0.0,
-        duration: 1,
-        ease: "power3.out",
-      });
-
-    function render(timestamp: number) {
-      positions = [];
-      spkies.forEach((g) => {
-        g.update(timestamp);
-        positions.push(g.one.x, g.one.y, g.one.z);
-        positions.push(g.two.x, g.two.y, g.two.z);
-      });
-    //   geometry.setAttribute(
-    //     "position",
-    //     new BufferAttribute(new Float32Array(positions), 3)
-    //   );
-
-      const vs = (itemObj.children[0] as Mesh).geometry.attributes.position
-        .array as any;
-
-      for (let i = 0; i < vs.length; i += 3) {
-        const v = new Vector3(
-          originHeart[i],
-          originHeart[i + 1],
-          originHeart[i + 2]
+        /**
+         * 生成舞台与相机
+         */
+        const scene = new THREE.Scene(); // 新建一个舞台
+        const camera = new THREE.PerspectiveCamera(
+          120, // 可视角度
+          window.innerWidth / window.innerHeight, // 实际窗口的纵横比
+          0.1,
+          1000
         );
-        const noise =
-          noise4d(
-            originHeart[i]! * 1.5,
-            originHeart[i + 1]! * 1.5,
-            originHeart[i + 2]! * 1.5,
-            timestamp * 0.0005
-          ) + 1;
-        v.multiplyScalar(1 + noise * 0.02 * beat.a);
-        vs[i] = v.x;
-        vs[i + 1] = v.y;
-        vs[i + 2] = v.z;
-      }
+        camera.position.z = 1; // 设置相机在三维坐标中的位置 .up设置相机拍摄时，相机头顶的方向 .lookAt设置相机拍摄时指向的方向
+        
+        /**
+         * 生成渲染器并设置
+         */
+        const renderer = new THREE.WebGLRenderer({
+          antialias: true // 是否执行抗锯齿
+        });
+        renderer.setClearColor(0xff5555); // 设置舞台背景颜色
+        renderer.setSize(window.innerWidth, window.innerHeight); // 设置舞台尺寸
+        
+        /**
+         * 将舞台插入页面中
+         */
+        (divRef.current! as HTMLElement).appendChild(renderer.domElement);
+        
+        /**
+         * 设置轨迹控制球
+         */
+        const controls = new TrackballControls(camera, renderer.domElement);
+        controls.noPan = true; // 是否禁用平移 默认为false
+        controls.maxDistance = 3; // 你能将摄像机向外移动多少
+        controls.minDistance = 0.7; // 你能将摄像机向内移动多少
+        
+        /**
+         * 它几乎和Object3D是相同的，目的是使组中对象在语法上的结构更加清晰
+         */
+        const group = new THREE.Group();
+        // 舞台添加group
+        scene.add(group);
+        
+        let heart: THREE.Object3D<THREE.Event> | null = null;
+        let sampler: { sample: (arg0: THREE.Vector3) => void; } | null = null;
+        let originHeart: any[] = [];
+        
+        /**
+         * 加载obj
+         * 将heart添加进前面定义的组里
+         */
+        new OBJLoader().load('https://assets.codepen.io/127738/heart_2.obj', (obj: { children: any[]; }) => {
+          heart = obj.children[0];
+          (heart! as Mesh).geometry.rotateX(-Math.PI * 0.5);
+          (heart! as Mesh).geometry.scale(0.04, 0.04, 0.04);
+          (heart! as Mesh).geometry.translate(0, -0.4, 0);
+          // 设置heart的材质颜色
+          (heart! as Mesh).material = new THREE.MeshBasicMaterial({
+            color: 0xff0000
+          });
+          console.log(obj)
+          group.add(heart!);
+        
+          // heart的原始位置
+          originHeart = Array.from((heart! as Mesh).geometry.attributes.position.array);
+          sampler = new MeshSurfaceSampler(heart as Mesh).build(); // 为模型添加采样器
+          init();
+          renderer.setAnimationLoop(render);
+        });
+        
+        let positions: any[] = [];
+        const geometry = new THREE.BufferGeometry();
+        const material = new THREE.LineBasicMaterial({
+          color: 0xf0f0f0
+        });
+        const lines = new THREE.LineSegments(geometry, material);
+        group.add(lines);
+        
+        const noise4D = createNoise4D()
+        const pos = new THREE.Vector3();
+        class Grass {
+          pos: THREE.Vector3;
+          scale: number;
+          one: Vector3;
+          two: Vector3;
+          constructor() {
+            sampler!.sample(pos); // 通过采样器随机位置采样 --（x,y,z）单次采样
+            this.pos = pos.clone();
+            this.scale = Math.random() * 0.001 + 0.001;
+            this.one = new Vector3(0,0,0);
+            this.two = new Vector3(0,0,0);
+          }
+          update(a: number) {
+            const noise = noise4D(this.pos.x * 1.5, this.pos.y * 1.5, this.pos.z * 1.5, a * 0.0005) + 2;
+            this.one = this.pos.clone().multiplyScalar(1.21 + (noise * 0.15 * beat.a)); // 第一个点的位置
+            this.two = this.one.clone().add(this.one.clone().setLength(this.scale)); // 第二个点的位置
+          }
+        }
+        
+        // 生成Grass的数组
+        let spikes: Grass[] = [];
+        function init() {
+          positions = [];
+          // 草的数量s
+          for (let i = 0; i < grassAmount; i++) {
+            const g = new Grass(); // 生成Grass的实例
+            spikes.push(g); // 将生成的Grass实例保存进spikes数组里
+          }
+        }
+        
+        const beat = { a: 0 };
+        gsap.timeline({
+          repeat: -1,
+          repeatDelay: 0.1
+        }).to(beat, {
+          a: 1.2,
+          duration: 0.7,
+          ease: 'power2.in'
+        }).to(beat, {
+          a: 0.0,
+          duration: 0.7,
+          ease: 'power3.out'
+        });
+        gsap.to(group.rotation, {
+          y: Math.PI * 2,
+          duration: 2,
+          ease: 'power3.out',
+          // repeat: -1
+        });
+        
+        /**
+         * 渲染函数
+         */
+        function render(a: number) {
+          // console.log(a)
+          positions = [];
+          spikes.forEach(g => {
+            g.update(a);
+            positions.push(g.one.x, g.one.y, g.one.z);
+            positions.push(g.two.x, g.two.y, g.two.z);
+          });
+          geometry.setAttribute('position', new THREE.BufferAttribute(new Float32Array(positions), 3));
+        
+          const vs = (heart! as Mesh).geometry.attributes.position.array as Float32Array;
+          for (let i = 0; i < vs.length; i += 3) {
+            const v = new THREE.Vector3(originHeart[i], originHeart[i + 1], originHeart[i + 2]);
+            const noise = noise4D(originHeart[i] * 1.5, originHeart[i + 1] * 1.5, originHeart[i + 2] * 1.5, a * 0.0005) + 1;
+            v.multiplyScalar(1 + (noise * 0.15 * beat.a));
+            vs[i] = v.x;
+            vs[i + 1] = v.y;
+            vs[i + 2] = v.z;
+          }
+          (heart! as Mesh).geometry.attributes.position.needsUpdate = true;
+        
+          controls.update();
+          renderer.render(scene, camera);
+        }    }, [])
 
-      (itemObj.children[0] as Mesh).geometry.attributes.position.needsUpdate =
-        true;
-
-      window.requestAnimationFrame(render);
-    }
-
-    window.requestAnimationFrame(render);
-
-    useFrame((state, delta) => {});
-    return (
-      <primitive
-        object={itemObj}
-        scale={0.04}
-        position={[0, -0.4, 0]}
-        rotation={[-Math.PI * 0.5, 0, 0]}
-      />
-    );
-  };
-  return (
-    <JumpHeartContainer>
-      <Canvas
-        camera={{ fov: 120, position: [0, 0.4, 1], near: 0.1, far: 1000 }}
-      >
-        <Scene itemObj={obj} noise4d={noise4d} />
-        <meshStandardMaterial color={"hotpink"} />
-        <OrbitControls maxDistance={3} minDistance={0.7} />
-        {/* <Environment preset="sunset" background /> */}
-      </Canvas>
-    </JumpHeartContainer>
-  );
+    return <div ref={divRef}></div>
 }
+
+export default JumpHeart
