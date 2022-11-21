@@ -48,7 +48,7 @@ function JumpHeart() {
       const renderer = new THREE.WebGLRenderer({
         antialias: true, // 是否执行抗锯齿
       });
-      renderer.setClearColor(0xff5555); // 设置舞台背景颜色
+      renderer.setClearColor(0x000000); // 设置舞台背景颜色
       renderer.setSize(window.innerWidth, window.innerHeight); // 设置舞台尺寸
 
       /**
