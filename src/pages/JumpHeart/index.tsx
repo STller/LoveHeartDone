@@ -9,23 +9,37 @@ import { gsap } from "gsap";
 
 function JumpHeart() {
   const divRef = useRef(null);
-  const grassAmount = 10000;
+  const grassAmount = 40000;
   const [heart, setHeart] = useState<Mesh | null>(null);
 
+  /**
+   * 加载OBJ文件
+   * @returns 
+   */
   function asyncLoader () {
     const objlaoder = new OBJLoader()
     return new Promise((resolve) => resolve(objlaoder.loadAsync('https://assets.codepen.io/127738/heart_2.obj')))
   } 
 
+  /**
+   * 初始化OBJ
+   */
   async function initOBJ () {
     const h = await asyncLoader() as Group
     setHeart(h.children[0] as Mesh)
   }
 
+  /**
+   * 页面初始化
+   * 首先初始化获取OBJ
+   */
   useEffect(() => {
     initOBJ()
   }, [])
 
+  /**
+   * 获取到OBJ后开始渲染
+   */
   useEffect(() => {
     if (heart) {
       console.clear();
@@ -61,7 +75,7 @@ function JumpHeart() {
        */
       const controls = new TrackballControls(camera, renderer.domElement);
       controls.noPan = true; // 是否禁用平移 默认为false
-      controls.maxDistance = 3; // 你能将摄像机向外移动多少
+      controls.maxDistance = 5; // 你能将摄像机向外移动多少
       controls.minDistance = 0.7; // 你能将摄像机向内移动多少
 
       /**
