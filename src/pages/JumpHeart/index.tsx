@@ -9,23 +9,37 @@ import { gsap } from "gsap";
 
 function JumpHeart() {
   const divRef = useRef(null);
-  const grassAmount = 10000;
+  const grassAmount = 40000;
   const [heart, setHeart] = useState<Mesh | null>(null);
 
+  /**
+   * 加载OBJ文件
+   * @returns 
+   */
   function asyncLoader () {
     const objlaoder = new OBJLoader()
     return new Promise((resolve) => resolve(objlaoder.loadAsync('https://assets.codepen.io/127738/heart_2.obj')))
   } 
 
+  /**
+   * 初始化OBJ
+   */
   async function initOBJ () {
     const h = await asyncLoader() as Group
     setHeart(h.children[0] as Mesh)
   }
 
+  /**
+   * 页面初始化
+   * 首先初始化获取OBJ
+   */
   useEffect(() => {
     initOBJ()
   }, [])
 
+  /**
+   * 获取到OBJ后开始渲染
+   */
   useEffect(() => {
     if (heart) {
       console.clear();
@@ -35,7 +49,7 @@ function JumpHeart() {
        */
       const scene = new THREE.Scene(); // 新建一个舞台
       const camera = new THREE.PerspectiveCamera(
-        120, // 可视角度
+        100, // 可视角度
         window.innerWidth / window.innerHeight, // 实际窗口的纵横比
         0.1,
         1000
