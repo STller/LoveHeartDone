@@ -49,7 +49,7 @@ function JumpHeart() {
        */
       const scene = new THREE.Scene(); // 新建一个舞台
       const camera = new THREE.PerspectiveCamera(
-        100, // 可视角度
+        120, // 可视角度
         window.innerWidth / window.innerHeight, // 实际窗口的纵横比
         0.1,
         1000
@@ -75,7 +75,7 @@ function JumpHeart() {
        */
       const controls = new TrackballControls(camera, renderer.domElement);
       controls.noPan = true; // 是否禁用平移 默认为false
-      controls.maxDistance = 3; // 你能将摄像机向外移动多少
+      controls.maxDistance = 5; // 你能将摄像机向外移动多少
       controls.minDistance = 0.7; // 你能将摄像机向内移动多少
 
       /**
