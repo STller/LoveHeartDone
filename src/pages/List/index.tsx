@@ -21,6 +21,7 @@ export default function List() {
   const [list, setList] = useState([
     { path: "/app/comeOn", label: "加油打气" },
     { path: "/app/jumpHeart", label: "跳动的心❤" },
+    { path: "/app/CornfieldChase", label: "CornfieldChase" },
   ]);
 
 

@@ -6,6 +6,7 @@ import { TrackballControls } from "three/examples/jsm/controls/TrackballControls
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader";
 import { MeshSurfaceSampler } from "three/examples/jsm/math/MeshSurfaceSampler";
 import { gsap } from "gsap";
+// import { Grass } from "./GrassClass";
 
 function JumpHeart() {
   const divRef = useRef(null);
@@ -14,19 +15,23 @@ function JumpHeart() {
 
   /**
    * 加载OBJ文件
-   * @returns 
+   * @returns
    */
-  function asyncLoader () {
-    const objlaoder = new OBJLoader()
-    return new Promise((resolve) => resolve(objlaoder.loadAsync('https://assets.codepen.io/127738/heart_2.obj')))
-  } 
+  function asyncLoader() {
+    const objlaoder = new OBJLoader();
+    return new Promise((resolve) =>
+      resolve(
+        objlaoder.loadAsync("https://assets.codepen.io/127738/heart_2.obj")
+      )
+    );
+  }
 
   /**
    * 初始化OBJ
    */
-  async function initOBJ () {
-    const h = await asyncLoader() as Group
-    setHeart(h.children[0] as Mesh)
+  async function initOBJ() {
+    const h = (await asyncLoader()) as Group;
+    setHeart(h.children[0] as Mesh);
   }
 
   /**
@@ -34,8 +39,8 @@ function JumpHeart() {
    * 首先初始化获取OBJ
    */
   useEffect(() => {
-    initOBJ()
-  }, [])
+    initOBJ();
+  }, []);
 
   /**
    * 获取到OBJ后开始渲染
@@ -78,36 +83,23 @@ function JumpHeart() {
       controls.maxDistance = 5; // 你能将摄像机向外移动多少
       controls.minDistance = 0.7; // 你能将摄像机向内移动多少
 
-      /**
-       * 它几乎和Object3D是相同的，目的是使组中对象在语法上的结构更加清晰
-       */
-      const group = new THREE.Group();
-      let positions: any[] = [];
-      const geometry = new THREE.BufferGeometry();
-      const material = new THREE.LineBasicMaterial({
-        color: 0xf0f0f0,
+      // 绕X轴旋转
+      // 缩放
+      // 沿Y轴移动
+      // 设置材质为基础材质
+      // 设置材质颜色
+      (heart! as Mesh).geometry.rotateX(-Math.PI * 0.5);
+      (heart! as Mesh).geometry.scale(0.04, 0.04, 0.04);
+      (heart! as Mesh).geometry.translate(0, -0.4, 0);
+      // 设置heart的材质颜色
+      (heart! as Mesh).material = new THREE.MeshBasicMaterial({
+        color: 0xff3333,
       });
-      const lines = new THREE.LineSegments(geometry, material);
-      group.add(lines);
-      // 舞台添加group
-      scene.add(group);
 
-      let sampler: { sample: (arg0: THREE.Vector3) => void } | null = null;
-      let originHeart: any[] = [];
-
-      const noise4D = createNoise4D();
-      const pos = new THREE.Vector3();
-
-      // 生成Grass的数组
-      let spikes: Grass[] = [];
-      function init() {
-        positions = [];
-        // 草的数量s
-        for (let i = 0; i < grassAmount; i++) {
-          const g = new Grass(); // 生成Grass的实例
-          spikes.push(g); // 将生成的Grass实例保存进spikes数组里
-        }
-      }
+      // 为模型添加采样器
+      const sampler = new MeshSurfaceSampler(heart as Mesh).build();
+      // 生成spikes
+      //   将采样器直接写在内部
       class Grass {
         pos: THREE.Vector3;
         scale: number;
@@ -120,6 +112,7 @@ function JumpHeart() {
           this.one = new Vector3(0, 0, 0);
           this.two = new Vector3(0, 0, 0);
         }
+        // 根据a值更新每一个点的位置
         update(a: number) {
           const noise =
             noise4D(
@@ -136,24 +129,50 @@ function JumpHeart() {
             .add(this.one.clone().setLength(this.scale)); // 第二个点的位置
         }
       }
+      //   控制spike跳动的值
+      const beat = { a: 0 };
+      let positions: any[] = [];
+      const spikes: Grass[] = [];
+      const pos = new THREE.Vector3();
+      //   初始化spike的数量
+      function init() {
+        positions = [];
+        // 草的数量s
+        for (let i = 0; i < grassAmount; i++) {
+          const g = new Grass(); // 生成Grass的实例
+          spikes.push(g); // 将生成的Grass实例保存进spikes数组里
+        }
+      }
+      //   执行初始化spike的数量
+      init();
 
-      (heart! as Mesh).geometry.rotateX(-Math.PI * 0.5);
-      (heart! as Mesh).geometry.scale(0.04, 0.04, 0.04);
-      (heart! as Mesh).geometry.translate(0, -0.4, 0);
-      // 设置heart的材质颜色
-      (heart! as Mesh).material = new THREE.MeshBasicMaterial({
-        color: 0xff3333,
+      //  新的分组
+      const group = new THREE.Group();
+      const geometry = new THREE.BufferGeometry(); // 保存spike
+      const material = new THREE.LineBasicMaterial({
+        color: 0xf0f0f0,
       });
+      const lines = new THREE.LineSegments(geometry, material);
+
+      //   分组添加lines
+      group.add(lines);
+      //   分组增加爱心
       group.add(heart!);
+      // 舞台添加group
+      scene.add(group);
+
+      let originHeart: any[] = [];
+
+      const noise4D = createNoise4D();
+
       // heart的原始位置
       originHeart = Array.from(
         (heart! as Mesh).geometry.attributes.position.array
       );
-      sampler = new MeshSurfaceSampler(heart as Mesh).build(); // 为模型添加采样器
-      init();
-      renderer.setAnimationLoop(render); // 启动循环渲染  
+      renderer.setAnimationLoop(render); // 启动循环渲染
 
-      const beat = { a: 0 };
+      //   利用gsap动画库控制beat-a值的变化
+      // 生成爱心跳动的效果
       gsap
         .timeline({
           repeat: -1,
@@ -180,18 +199,24 @@ function JumpHeart() {
        * 渲染函数
        */
       function render(a: number) {
-        // console.log(a)
+        // 清空positions数组
         positions = [];
+        // 循环遍历spikes
+        // 利用新的beat-a值传入spikes内部调用update方法
+        // 更新内部的one值
         spikes.forEach((g) => {
           g.update(a);
           positions.push(g.one.x, g.one.y, g.one.z);
           positions.push(g.two.x, g.two.y, g.two.z);
         });
+        // 为spikes设置属性position
         geometry.setAttribute(
           "position",
           new THREE.BufferAttribute(new Float32Array(positions), 3)
         );
 
+        // 爱心的position属性 
+        // 数组格式
         const vs = (heart! as Mesh).geometry.attributes.position
           .array as Float32Array;
         for (let i = 0; i < vs.length; i += 3) {
@@ -207,6 +232,7 @@ function JumpHeart() {
               originHeart[i + 2] * 1.5,
               a * 0.0005
             ) + 1;
+        // 加入noise属性会产生随机起伏的效果
           v.multiplyScalar(1 + noise * 0.15 * beat.a);
           vs[i] = v.x;
           vs[i + 1] = v.y;
