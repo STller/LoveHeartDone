@@ -4,6 +4,7 @@ export default async function createAudio(url: string) {
   const res = await fetch(url);
   const buffer = await res.arrayBuffer();
   const context = new window.AudioContext();
+  context.resume();
   const source = context.createBufferSource();
   source.buffer = await new Promise((res) => context.decodeAudioData(buffer, res));
   source.loop = true;
