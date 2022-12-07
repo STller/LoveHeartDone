@@ -1,9 +1,11 @@
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { Suspense, useState } from "react";
 import styled from "styled-components";
+import { suspend } from "suspend-react";
 import Track from "./components/Track";
 import './style.css'
-import Zoom from "./utils/zoom";
+import createAudio from "./utils/createAudio";
+// import Zoom from "./utils/zoom";
 
 const GalaxyContainer = styled.div`
   width: 100vw;
@@ -56,3 +58,14 @@ export default function CornfieldChase() {
     </CornfieldChaseContainer>
   )
 }
+
+function Zoom({ url }: { url: string }) {
+    // This will *not* re-create a new audio source, suspense is always cached,
+    // so this will just access (or create and then cache) the source according to the url
+    const { avg } = suspend(() => createAudio(url), [url])
+    return useFrame((state) => {
+      // Set the cameras field of view according to the frequency average
+      (state.camera as any).fov = 25 - avg / 15
+      state.camera.updateProjectionMatrix()
+    })
+  }
