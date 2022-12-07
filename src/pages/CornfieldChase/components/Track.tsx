@@ -15,8 +15,9 @@ interface propsType {
 }
 export default function Track ({url, y = 2500, space = 1.8, width = 0.01, height = 0.05, obj = new Object3D(), ...props}: propsType) {
     const ref = useRef<InstancedMesh>(null!)
-    const { gain, context, update, data, } = suspend(() => createAudio(url), [url])
+    const { gain, context, update, data, source } = suspend(() => createAudio(url), [url])
     useEffect(() => {
+        // source.start(0)
         gain.connect(context.destination)
         return () => gain.disconnect()
     }, [gain, context])
