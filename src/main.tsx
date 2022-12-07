@@ -4,6 +4,9 @@ import { BrowserRouter, Navigate, redirect, Route, Routes } from "react-router-d
 import App from "./App";
 import "./index.css";
 import List from "./pages/List";
+import VConsole from "vconsole";
+
+const vConsole = new VConsole({ theme: 'dark' });
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
