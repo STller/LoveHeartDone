@@ -4,15 +4,21 @@ export default async function createAudio(url: string) {
   const res = await fetch(url);
   const buffer = await res.arrayBuffer();
   const context = new window.AudioContext();
-  context.resume();
-  const source = context.createBufferSource();
-  source.buffer = await new Promise((res) => context.decodeAudioData(buffer, res));
-  source.loop = true;
-  source.start(0);
+  let source: AudioBufferSourceNode | null = null
+  await new Promise((res) =>
+    context.decodeAudioData(buffer, (decode) => {
+      context.resume();
+      source = context.createBufferSource();
+      source.buffer = decode
+      source.connect(context.destination)
+      source!.loop = true;
+      source.start(0)
+    })
+  );
   const gain = context.createGain();
   const analyser = context.createAnalyser();
   analyser.fftSize = 64;
-  source.connect(analyser);
+  source!.connect(analyser);
   analyser.connect(gain);
   // The data array receieve the audio frequencies
   const data = new Uint8Array(analyser.frequencyBinCount);
