@@ -19,6 +19,8 @@ export default function Track ({url, y = 2500, space = 1.8, width = 0.01, height
     useEffect(() => {
         // source.start(0)
         gain.connect(context.destination)
+        context.resume()
+        source.start(0)
         return () => gain.disconnect()
     }, [gain, context])
     useFrame(() => {
