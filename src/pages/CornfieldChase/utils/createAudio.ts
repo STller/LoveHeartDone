@@ -7,7 +7,7 @@ export default async function createAudio(url: string) {
   const source = context.createBufferSource();
   source.buffer = await new Promise((res) => context.decodeAudioData(buffer, res));
   source.loop = true;
-  source.start(0);
+  // source.start(0);
   const gain = context.createGain();
   const analyser = context.createAnalyser();
   analyser.fftSize = 64;
