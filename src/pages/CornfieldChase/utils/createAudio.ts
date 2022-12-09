@@ -3,11 +3,16 @@ export default async function createAudio(url: string) {
   // Fetch audio data and create a buffer source
   const res = await fetch(url);
   const buffer = await res.arrayBuffer();
+
+  // Create AudioContext
   const context = new window.AudioContext();
   const source = context.createBufferSource();
-  source.buffer = await new Promise((res) => context.decodeAudioData(buffer, res));
+  source.buffer = await new Promise((res) =>
+    context.decodeAudioData(buffer, res)
+  );
   source.loop = true;
   source.start(0);
+  
   const gain = context.createGain();
   const analyser = context.createAnalyser();
   analyser.fftSize = 64;
