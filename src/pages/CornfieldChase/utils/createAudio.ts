@@ -11,7 +11,7 @@ export default async function createAudio(url: string) {
     context.decodeAudioData(buffer, res)
   );
   source.loop = true;
-  source.start(0);
+  // source.start(0);
   
   const gain = context.createGain();
   const analyser = context.createAnalyser();

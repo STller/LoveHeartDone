@@ -22,16 +22,20 @@ export default function Track({
   obj = new Object3D(),
   ...props
 }: propsType) {
+  const { ready } = props
   const ref = useRef<InstancedMesh>(null!);
   const { gain, context, update, data, source } = suspend(
     () => createAudio(url),
     [url]
   );
   useEffect(() => {
-    // source.start(0)
-    gain.connect(context.destination);
+    if (ready) {
+      context.resume();
+      source.start(0);
+      gain.connect(context.destination);
+    }
     return () => gain.disconnect();
-  }, [gain, context]);
+  }, [gain, context, ready]);
   useFrame(() => {
     let avg = update();
     for (let i = 0; i < data.length; i++) {

@@ -36,34 +36,45 @@ export default function CornfieldChase() {
   const [ready, setReady] = useState(false);
   return (
     <CornfieldChaseContainer>
-       {
-            !ready && (
-                <div style={{zIndex:1}} className={`fullscreen ${ready ? 'ready' : 'notready'} ${ready && 'clicked'}`}>
-                    <div className="stack">
-                        <button onClick={() => setReady(true)}>▶️</button>
-                    </div>
-                </div>
-            )
-        }
-        {
-            (
-                <Canvas shadows dpr={[1, 2]} camera={{ position: [-1, 1.5, 2], fov: 25 }}>
-                    <spotLight position={[-4, 4, -4]} angle={0.06} penumbra={1} castShadow shadow-mapSize={[2048, 2048]} />
-                    <Suspense fallback={null}>
-                        {
-                            ready && (
-                                <Track position-z={0} url={'/CornfieldChase.mp3'} />
-                            )
-                        }
-                        <Zoom url="/CornfieldChase.mp3" />
-                    </Suspense>
-                    <mesh receiveShadow rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.025, 0]}>
-                        <planeGeometry />
-                        <shadowMaterial transparent opacity={0.15} />
-                    </mesh>
-                </Canvas>
-            )
-        }
+      {!ready && (
+        <div
+          style={{ zIndex: 1 }}
+          className={`fullscreen ${ready ? "ready" : "notready"} ${
+            ready && "clicked"
+          }`}
+        >
+          <div className="stack">
+            <button onClick={() => setReady(true)}>▶️</button>
+          </div>
+        </div>
+      )}
+      {
+        <Canvas
+          shadows
+          dpr={[1, 2]}
+          camera={{ position: [-1, 1.5, 2], fov: 25 }}
+        >
+          <spotLight
+            position={[-4, 4, -4]}
+            angle={0.06}
+            penumbra={1}
+            castShadow
+            shadow-mapSize={[2048, 2048]}
+          />
+          <Suspense fallback={null}>
+            {<Track ready={ready} position-z={0} url={"/CornfieldChase.mp3"} />}
+            <Zoom url="/CornfieldChase.mp3" />
+          </Suspense>
+          <mesh
+            receiveShadow
+            rotation={[-Math.PI / 2, 0, 0]}
+            position={[0, -0.025, 0]}
+          >
+            <planeGeometry />
+            <shadowMaterial transparent opacity={0.15} />
+          </mesh>
+        </Canvas>
+      }
     </CornfieldChaseContainer>
   );
 }
