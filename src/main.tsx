@@ -6,7 +6,7 @@ import "./index.css";
 import List from "./pages/List";
 import VConsole from "vconsole";
 
-// const vConsole = new VConsole({ theme: 'dark' });
+const vConsole = new VConsole({ theme: 'dark' });
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
   <React.StrictMode>
