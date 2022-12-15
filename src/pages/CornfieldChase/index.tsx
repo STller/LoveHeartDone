@@ -49,6 +49,7 @@ export default function CornfieldChase() {
         </div>
       )}
       {
+        ready && 
         <Canvas
           shadows
           dpr={[1, 2]}

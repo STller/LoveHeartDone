@@ -31,14 +31,14 @@ export default function Track({
   
   function init () {
     console.log('click')
-    const { gain, context, update, data, source } = suspend(
-      () => createAudio(url),
-      [url]
-    );
+    // const { gain, context, update, data, source } = suspend(
+    //   () => createAudio(url),
+    //   [url]
+    // );
   }
   useEffect(() => {
-    window.addEventListener('click', init)
-    return removeEventListener('click', init)
+    document.addEventListener('touchend', init)
+    return document.removeEventListener('touchend', init)
   }, [])
   useEffect(() => {
     if (ready) {
