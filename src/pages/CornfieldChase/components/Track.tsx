@@ -30,6 +30,7 @@ export default function Track({
   );
   
   function init () {
+    console.log('click')
     const { gain, context, update, data, source } = suspend(
       () => createAudio(url),
       [url]
