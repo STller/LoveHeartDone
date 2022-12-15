@@ -28,6 +28,17 @@ export default function Track({
     () => createAudio(url),
     [url]
   );
+  
+  function init () {
+    const { gain, context, update, data, source } = suspend(
+      () => createAudio(url),
+      [url]
+    );
+  }
+  useEffect(() => {
+    window.addEventListener('click', init)
+    return removeEventListener('click', init)
+  }, [])
   useEffect(() => {
     if (ready) {
       context.resume();
