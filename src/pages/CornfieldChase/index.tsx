@@ -34,6 +34,7 @@ const CornfieldChaseContainer = styled.div`
 `;
 export default function CornfieldChase() {
   const [ready, setReady] = useState(false);
+  const [context, setContext] = useState<AudioContext>(null!);
   return (
     <CornfieldChaseContainer>
       {!ready && (
@@ -44,12 +45,18 @@ export default function CornfieldChase() {
           }`}
         >
           <div className="stack">
-            <button onClick={() => setReady(true)}>▶️</button>
+            <button
+              onClick={() => {
+                setContext(new window.AudioContext());
+                setReady(true);
+              }}
+            >
+              ▶️
+            </button>
           </div>
         </div>
       )}
-      {
-        ready && 
+      {ready && (
         <Canvas
           shadows
           dpr={[1, 2]}
@@ -63,8 +70,13 @@ export default function CornfieldChase() {
             shadow-mapSize={[2048, 2048]}
           />
           <Suspense fallback={null}>
-            {<Track ready={ready} position-z={0} url={"/CornfieldChase.mp3"} />}
-            <Zoom url="/CornfieldChase.mp3" />
+            <Track
+              context={context}
+              ready={ready}
+              position-z={0}
+              url={"/CornfieldChase.mp3"}
+            />
+            <Zoom context={context} url="/CornfieldChase.mp3" />
           </Suspense>
           <mesh
             receiveShadow
@@ -75,15 +87,15 @@ export default function CornfieldChase() {
             <shadowMaterial transparent opacity={0.15} />
           </mesh>
         </Canvas>
-      }
+      )}
     </CornfieldChaseContainer>
   );
 }
 
-function Zoom({ url }: { url: string }) {
+function Zoom({ url, context }: { url: string; context: AudioContext }) {
   // This will *not* re-create a new audio source, suspense is always cached,
   // so this will just access (or create and then cache) the source according to the url
-  const { avg } = suspend(() => createAudio(url), [url]);
+  const { avg } = suspend(() => createAudio(url, context), [url]);
   return useFrame((state) => {
     // Set the cameras field of view according to the frequency average
     (state.camera as any).fov = 25 - avg / 15;
