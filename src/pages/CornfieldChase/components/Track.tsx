@@ -6,6 +6,7 @@ import createAudio from "../utils/createAudio";
 
 interface propsType {
   url: string;
+  context: AudioContext;
   y?: number;
   space?: number;
   width?: number;
@@ -15,6 +16,7 @@ interface propsType {
 }
 export default function Track({
   url,
+  context,
   y = 2500,
   space = 1.8,
   width = 0.01,
@@ -24,19 +26,19 @@ export default function Track({
 }: propsType) {
   const { ready } = props
   const ref = useRef<InstancedMesh>(null!);
-  const { gain, context, update, data, source } = suspend(
-    () => createAudio(url),
+  const { gain, update, data, source } = suspend(
+    () => createAudio(url, context),
     [url]
   );
   
   useEffect(() => {
-    if (ready) {
+    if (context) {
       context.resume();
       source.start(0);
       gain.connect(context.destination);
     }
     return () => gain.disconnect();
-  }, [gain, context, ready]);
+  }, [context]);
   useFrame(() => {
     let avg = update();
     for (let i = 0; i < data.length; i++) {
