@@ -29,17 +29,6 @@ export default function Track({
     [url]
   );
   
-  function init () {
-    console.log('click')
-    // const { gain, context, update, data, source } = suspend(
-    //   () => createAudio(url),
-    //   [url]
-    // );
-  }
-  useEffect(() => {
-    document.addEventListener('touchend', init)
-    return document.removeEventListener('touchend', init)
-  }, [])
   useEffect(() => {
     if (ready) {
       context.resume();

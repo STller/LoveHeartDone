@@ -1,5 +1,5 @@
 import { Canvas, useFrame } from "@react-three/fiber";
-import { Suspense, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import styled from "styled-components";
 import { suspend } from "suspend-react";
 import Track from "./components/Track";
@@ -48,8 +48,7 @@ export default function CornfieldChase() {
           </div>
         </div>
       )}
-      {
-        ready && 
+      {ready && (
         <Canvas
           shadows
           dpr={[1, 2]}
@@ -62,10 +61,10 @@ export default function CornfieldChase() {
             castShadow
             shadow-mapSize={[2048, 2048]}
           />
-          <Suspense fallback={null}>
-            {<Track ready={ready} position-z={0} url={"/CornfieldChase.mp3"} />}
-            <Zoom url="/CornfieldChase.mp3" />
-          </Suspense>
+          {/* <Suspense fallback={null}> */}
+          <Track ready={ready} position-z={0} url={"/CornfieldChase.mp3"} />
+          <Zoom url="/CornfieldChase.mp3" />
+          {/* </Suspense> */}
           <mesh
             receiveShadow
             rotation={[-Math.PI / 2, 0, 0]}
@@ -75,7 +74,7 @@ export default function CornfieldChase() {
             <shadowMaterial transparent opacity={0.15} />
           </mesh>
         </Canvas>
-      }
+      )}
     </CornfieldChaseContainer>
   );
 }
